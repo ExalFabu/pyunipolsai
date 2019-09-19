@@ -1,0 +1,5 @@
+UNIPOLSAI_BASE = "https://www.unipolsai.it/"
+LOGIN_URL = "myportal/login"
+HOME_URL = "myportal/area_riservata/home"
+POST_LOGIN = "api/priv/crm/users/v1/myPostLogin"
+API_URL = "api/priv/telematics/vehicles/v1/vehicles/IT-{plate}/lastPosition?update={update}"

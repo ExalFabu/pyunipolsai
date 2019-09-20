@@ -10,4 +10,4 @@ Questo script, per comunicare con le API di UnipolSai ha bisogno, oltre alle cre
     * Spostarsi nella casella Network o Rete
 1. Con la scheda Rete aperta, cliccare ¨Richiedi posizione corrente" e poi confermare
 1. Con una [schermata del genere](https://i.imgur.com/bHDoOJH.png) davanti, copiate i dati sottolineati nel file `secrets_template.py`
-1. Rinominare il file `secrets_template.py` in `secrets.py`
+1. Rinominare il file `secrets_template.py` in `secrets.py` e spostare quest'ultimo dentro la cartella `pyunipolsai/` 

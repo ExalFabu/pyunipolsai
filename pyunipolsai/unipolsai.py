@@ -4,21 +4,37 @@ from pyunipolsai.urls import UNIPOLSAI_BASE, LOGIN_URL, HOME_URL, POST_LOGIN, AP
 
 
 class Unipolsai:
-    def __init__(self, creds: dict, headers:dict):
+    def __init__(self, creds: dict, headers: dict):
+        """Define Unipolsai object
+
+        :param creds: dict with username and password
+        :param headers: dict with headers needed to authenticate, see documentation.
+        """
         self.creds = creds
         self.session = requests.session()
         self.session.headers.update(headers)
         self.is_authenticated = False
 
     def authenticate(self):
+        """Authenticate the instance on the site
+        :return: True if authentication was succesfull
+        """
         self.session.head(UNIPOLSAI_BASE)
         self.session.post(UNIPOLSAI_BASE + LOGIN_URL, data=self.creds)
         self.session.head(UNIPOLSAI_BASE + HOME_URL)
-        self.is_authenticated = self._check_auth()
-
-    def get_position(self, plate:str, update:bool) -> PositionData:
-        self.is_authenticated = self._check_auth()
+        self._check_auth()
         if not self.is_authenticated:
+            raise ConnectionError("There was some error connecting to the API")
+        return self.is_authenticated
+
+    def get_position(self, plate: str, update: bool) -> PositionData:
+        """Get the latest position retrieved from the GPS Unibox
+
+        :param plate: plate of the car you want to locate
+        :param update: if True it will request an update of the position. In a couple of minutes or less it should be updated
+        :return: PositionData object with the last position retrieved
+        """
+        if not self._check_auth():
             self.authenticate()
         response = self.session.get(
             url=UNIPOLSAI_BASE + API_URL.format(plate=str(plate).upper(),
@@ -36,7 +52,12 @@ class Unipolsai:
         response = self.session.post(
             url=UNIPOLSAI_BASE + POST_LOGIN,
             data={'channel': "TPD_Web"})
-        return response.status_code == 200
+        self.is_authenticated = response.status_code == 200
+        return self.is_authenticated
 
     def __del__(self):
+        try:
+            response = self.session.get(UNIPOLSAI_BASE + "myportal/logout", headers={"Connection": "close"})
+        except requests.ConnectionError:
+            pass
         self.session.close()

@@ -18,13 +18,20 @@ class PositionData:
             'zipcode': self.zipcode,
             'time': self.time})
 
+    def as_dict(self):
+        return {'unix_timestamp': self.unix_timestamp,
+                'lat': self.lat,
+                'lon': self.lon,
+                'address': self.address,
+                'zipcode': self.zipcode,
+                'time': self.time}
+
     @staticmethod
     def parse_unix(unix_timestamp, tz, dst) -> dict:
-        """
-        Convert from UNIX timestamp to custom format timestamp
+        """Convert from UNIX timestamp to custom format timestamp
         :param unix_timestamp: unix timestamp
-        :param tz: timezone
-        :param dst: daylight saving time
+        :param tz: timezone in seconds
+        :param dst: daylight saving time in seconds
         :returns: Date in custom format
         """
         import datetime

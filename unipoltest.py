@@ -14,5 +14,16 @@ class UnipolSai(unittest.TestCase):
         pos = uni.get_position(plate=PLATE, update=False)
         self.assertIsInstance(pos, pyunipolsai.PositionData)
 
+
+class PositionData(unittest.TestCase):
+    def test_init(self):
+        pd = pyunipolsai.utils.PositionData(unix_timestamp=156890938000, timezone=3600,
+                                            dst=3600, lat=38.17301, lon=13.160862, address='Via Iccara',
+                                            zipcode=90044)
+        self.assertIsNotNone(pd)
+        print(pd.as_dict())
+        self.assertIsInstance(pd.as_dict(), dict)
+
+
 if __name__ == '__main__':
     unittest.main(exit=False)

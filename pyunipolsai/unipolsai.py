@@ -1,6 +1,7 @@
 import requests
-from .utils import PositionData
-from .urls import UNIPOLSAI_BASE, LOGIN_URL, HOME_URL, POST_LOGIN, API_URL
+from pyunipolsai.utils import PositionData
+from pyunipolsai.urls import UNIPOLSAI_BASE, LOGIN_URL, HOME_URL, POST_LOGIN, API_URL
+
 
 class Unipolsai:
     def __init__(self, creds: dict, headers:dict):

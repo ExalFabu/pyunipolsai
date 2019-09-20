@@ -1,43 +1,44 @@
 class PositionData:
-    def __init__(self, unix_timestamp,timezone, dst, lat, lon, address, zipcode):
-        self.unix_timestamp = unix_timestamp
+    def __init__(self, unix_timestamp, timezone, dst, lat, lon, address, zipcode):
+        self.unix_timestamp = str(unix_timestamp)[:10]
         self.tz = timezone
         self.dst = dst
         self.lat = lat
         self.lon = lon
         self.address = address
         self.zipcode = zipcode
-        self.formatted_date = PositionData.parse_unix(self.unix_timestamp, self.tz, self.dst)
+        self.time = PositionData.parse_unix(self.unix_timestamp, self.tz, self.dst)
 
-
-    def __repr__(self) -> dict:
-        return {
+    def __str__(self):
+        return str({
             'unix_timestamp': self.unix_timestamp,
             'lat': self.lat,
             'lon': self.lon,
             'address': self.address,
             'zipcode': self.zipcode,
-            'datetime': self.formatted_date}
-
-    def __str__(self):
-        return self.__repr__()
+            'time': self.time})
 
     @staticmethod
-    def parse_unix(unix_timestamp, tz, dst, fmt="%H:%M %a - %d/%m/%y") -> str:
+    def parse_unix(unix_timestamp, tz, dst) -> dict:
         """
         Convert from UNIX timestamp to custom format timestamp
         :param unix_timestamp: unix timestamp
         :param tz: timezone
         :param dst: daylight saving time
-        :param fmt: custom date format
         :returns: Date in custom format
         """
         import datetime
         timezone = datetime.timezone(datetime.timedelta(seconds=tz + dst))
         unix_timestamp = float(str(unix_timestamp)[:10])
-        unformatted_date = datetime.datetime.fromtimestamp(unix_timestamp, timezone)
-        formatted_date = unformatted_date.strftime(fmt)
-        return str(formatted_date)
+        dt = datetime.datetime.fromtimestamp(unix_timestamp, timezone)
+        return {'time': dt.strftime("%H:%m:%S"),
+                'date': {
+                    'day': dt.day,
+                    'month': dt.month,
+                    'year': dt.year
+                },
+                'date-iso': dt.strftime("%Y-%m-%d")
+                }
 
     @staticmethod
     def parse_raw_position(raw_position):

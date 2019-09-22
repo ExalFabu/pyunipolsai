@@ -7,6 +7,8 @@ https://github.com/ExalFabu/pyunipolsai
 """
 from .secrets import CREDS, HEADERS
 from .unipolsai import Unipolsai
+from .utils import PositionData
+
 import logging
 
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")

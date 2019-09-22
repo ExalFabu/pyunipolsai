@@ -15,10 +15,9 @@ parser.add_argument("-p", "--plate", metavar="AA000AA", type=str, default=PLATE,
                          "invece di quella specificata in 'secrets.py' ({})".format(PLATE))
 args = parser.parse_args()
 
-PLATE = args.plate
 pyunipolsai.check_secrets_integrity()
+PLATE = args.plate
 
 uni = pyunipolsai.authenticate()
-print(uni.is_authenticated)
 position = uni.get_position(plate=PLATE, update=args.update)
 print("Position: {}".format(position))

@@ -14,6 +14,14 @@ class UnipolSai(unittest.TestCase):
         pos = uni.get_position(plate=PLATE, update=False)
         self.assertIsInstance(pos, pyunipolsai.PositionData)
 
+    def test_position_update(self):
+        uni = pyunipolsai.authenticate(CREDS, HEADERS)
+        self.assertTrue(uni.is_authenticated)
+        old_pos = uni.get_position(plate=PLATE, update=False)
+        pos = uni.get_position(plate=PLATE, update=True)
+        self.assertIsInstance(pos, pyunipolsai.PositionData)
+        self.assertNotEqual(old_pos.unix_timestamp, pos.unix_timestamp)
+
 
 class PositionData(unittest.TestCase):
     def test_init(self):

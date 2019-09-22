@@ -1,10 +1,13 @@
-import time
 import logging
-import requests
-from pyunipolsai.utils import PositionData
-from pyunipolsai.urls import UNIPOLSAI_BASE, LOGIN_URL, HOME_URL, POST_LOGIN, API_URL
+import time
 
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+import requests
+
+from .urls import UNIPOLSAI_BASE, LOGIN_URL, HOME_URL, POST_LOGIN, API_URL
+from .utils import PositionData
+from .secrets import PLATE
+
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 
 class Unipolsai:
@@ -31,13 +34,15 @@ class Unipolsai:
             raise ConnectionError("There was some error connecting to the API")
         return self.is_authenticated
 
-    def get_position(self, plate: str, update: bool = False):
+    def get_position(self, plate: str = PLATE, update: bool = False):
         """Get the latest position retrieved from the GPS Unibox
 
         :param plate: plate of the vehicle you want to locate
         :param update: if True it will request an update of the position and start a polling waiting for a new position
         :return: PositionData object with the last position retrieved
         """
+        if not plate:
+            raise AttributeError("If PLATE is not set in secrets.py you have to pass it as an argument")
         if not self._check_auth():
             self.authenticate()
         response = self.session.get(

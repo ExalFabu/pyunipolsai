@@ -1,7 +1,9 @@
 #!venv/python3
 
 import argparse
+
 import pyunipolsai
+
 PLATE = pyunipolsai.secrets.PLATE
 required_plate = not PLATE
 
@@ -17,7 +19,7 @@ args = parser.parse_args()
 
 pyunipolsai.check_secrets_integrity()
 PLATE = args.plate
-
+print("Richiedendo la posizione per il veicolo targato '{}'. Aggiornare: {}".format(PLATE, args.update))
 uni = pyunipolsai.authenticate()
 position = uni.get_position(plate=PLATE, update=args.update)
 print("Position: {}".format(position))

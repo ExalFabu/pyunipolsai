@@ -5,10 +5,8 @@ assicurata con UnipolSai compresa di Unibox (localizzatore GPS)
 Guarda la documentazione per vedere come iniziare ad usare questa libreria
 https://github.com/ExalFabu/pyunipolsai
 """
-from pyunipolsai.unipolsai import Unipolsai
-from pyunipolsai.secrets import CREDS, HEADERS
-from pyunipolsai.utils import PositionData
-from pyunipolsai.urls import UNIPOLSAI_BASE, API_URL, HOME_URL, LOGIN_URL, POST_LOGIN
+from .secrets import CREDS, HEADERS
+from .unipolsai import Unipolsai
 
 
 def check_secrets_integrity() -> bool:

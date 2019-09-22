@@ -1,8 +1,11 @@
 #!venv/python3
 
-import argparse
+import argparse, logging
 
 import pyunipolsai
+
+logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 PLATE = pyunipolsai.secrets.PLATE
 required_plate = not PLATE

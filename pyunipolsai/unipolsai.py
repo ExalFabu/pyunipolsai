@@ -8,6 +8,7 @@ from .utils import PositionData
 from .secrets import PLATE
 
 logging.basicConfig(level=logging.WARNING, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 
 class Unipolsai:
@@ -56,12 +57,13 @@ class Unipolsai:
                 if update:
                     new_position = self._poll_position(plate=plate, last_position=parsed_position)
                     if new_position is None:
-                        logging.warning("Requested updated position, couldn't return it. (Probably needed more time)")
-                        logging.debug(str(parsed_position))
+                        logger.warning("Requested updated position, couldn't return it. (Probably needed more time)")
+                        logger.debug(str(parsed_position))
                         return parsed_position
-                    logging.info("Requested updated position, returned it.")
-                    logging.debug(str(new_position))
+                    logger.info("Requested updated position, returned it.")
+                    logger.debug(str(new_position))
                     return new_position
+                logger.info("Requested position without updating")
                 return parsed_position
         else:
             print(str(response.status_code) + str(response.content))
@@ -75,7 +77,7 @@ class Unipolsai:
             data={'channel': "TPD_Web"})
         self.is_authenticated = response.status_code == 200
         if not self.is_authenticated:
-            logging.error("Authentication failed: {}".format(response.content))
+            logger.error("Authentication failed: {}".format(response.content))
         return self.is_authenticated
 
     def _poll_position(self, plate: str, last_position: PositionData, initial_delay: int = 40, delay: int = 12,
@@ -94,32 +96,35 @@ class Unipolsai:
         now = datetime.datetime.now().timestamp()
         ten_min_ago = str(now - (10 * 60))[:10]
         if ten_min_ago < last_position.unix_timestamp:
-            logging.debug("5m ago: {} | lastPos: {}".format(ten_min_ago, last_position.unix_timestamp))
-            logging.info("Requested an update too soon, returning the last position")
+            logger.debug("5m ago: {} | lastPos: {}".format(ten_min_ago, last_position.unix_timestamp))
+            logger.info("Requested an update too soon, returning the last position")
             # since the api won't respond I just skip that and return it instantly
             return last_position
-        logging.debug("Waiting initial {} seconds".format(initial_delay))
+        logger.debug("Waiting initial {} seconds".format(initial_delay))
         time.sleep(initial_delay)
         for n in range(tries):
             try:
                 new_position = self.get_position(plate)
                 if new_position.unix_timestamp == last_position.unix_timestamp:
-                    logging.debug("#{}. Still not updated. Delay: {}".format(n, delay))
+                    logger.debug("#{}. Still not updated. Delay: {}".format(n, delay))
                     time.sleep(delay)
                     delay = int(delay * backoff)
                 else:
-                    logging.debug("Found new position on #{} after {} seconds".format(n, initial_delay + delay))
+                    logger.debug("Found new position on #{} after {} seconds".format(n, initial_delay + delay))
                     return new_position
             except AttributeError as a_e:
-                logging.warning("Attribute Error: {}".format(a_e))
+                logger.warning("Attribute Error: {}".format(a_e))
                 pass
             except ConnectionError as c_e:
-                logging.warning("Connection Error: {}".format(c_e))
+                logger.warning("Connection Error: {}".format(c_e))
         return None
 
     def __del__(self):
+        logger.debug("Logging off")
         try:
             response = self.session.get(UNIPOLSAI_BASE + "myportal/logout", headers={"Connection": "close"})
         except requests.ConnectionError:
+            # Don't really understand this
             pass
+        logger.info("Succesfully logged off")
         self.session.close()

@@ -1,5 +1,5 @@
 class PositionData:
-    def __init__(self, unix_timestamp, timezone, dst, lat, lon, address, zipcode):
+    def __init__(self, unix_timestamp, timezone, dst, lat, lon, address, zipcode, accuracy):
         self.unix_timestamp = str(unix_timestamp)[:10]
         self.tz = timezone
         self.dst = dst
@@ -7,24 +7,20 @@ class PositionData:
         self.lon = lon
         self.address = address
         self.zipcode = zipcode
-        self.time = PositionData.parse_unix(self.unix_timestamp, self.tz, self.dst)
+        self.datetime = PositionData.parse_unix(self.unix_timestamp, self.tz, self.dst)
+        self.accuracy = accuracy
 
-    def __str__(self):
-        return str({
-            'unix_timestamp': self.unix_timestamp,
-            'lat': self.lat,
-            'lon': self.lon,
-            'address': self.address,
-            'zipcode': self.zipcode,
-            'time': self.time})
-
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {'unix_timestamp': self.unix_timestamp,
                 'lat': self.lat,
                 'lon': self.lon,
                 'address': self.address,
                 'zipcode': self.zipcode,
-                'time': self.time}
+                'time': self.datetime,
+                'accuracy': self.accuracy}
+
+    def __str__(self):
+        return str(self.as_dict())
 
     @staticmethod
     def parse_unix(unix_timestamp, tz, dst) -> dict:
@@ -38,14 +34,8 @@ class PositionData:
         timezone = datetime.timezone(datetime.timedelta(seconds=tz + dst))
         unix_timestamp = float(str(unix_timestamp)[:10])
         dt = datetime.datetime.fromtimestamp(unix_timestamp, timezone)
-        return {'time': dt.strftime("%H:%m:%S"),
-                'date': {
-                    'day': dt.day,
-                    'month': dt.month,
-                    'year': dt.year
-                },
-                'date-iso': dt.strftime("%Y-%m-%d")
-                }
+        return {'time': dt.strftime("%H:%M:%S"),
+                'date': dt.strftime("%Y-%m-%d")}
 
     @staticmethod
     def parse_raw_position(raw_position):
@@ -56,6 +46,7 @@ class PositionData:
             dst=raw_position.get("daylightSavingTime"),
             lat=raw_position.get("lat"),
             lon=raw_position.get("lon"),
-            address=raw_position.get("address"),
-            zipcode=raw_position.get("zipCode")
+            address=raw_position.get("address") + ", " + raw_position.get("streetNumber"),
+            zipcode=raw_position.get("zipCode"),
+            accuracy=raw_position.get("accuracy")
         )

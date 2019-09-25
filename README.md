@@ -36,6 +36,7 @@ $ python -m pyunipolsai -p DD012BB -u
 ```python
 import pyunipolsai
 uni = pyunipolsai.authenticate() # usando i dati presenti su secrets.py
+# oppure uni = pyunipolsai.Unipolsai(creds, headers) passando i dati direttamente al costruttore
 p = uni.get_position(plate="DD012BB", update=False) # se PLATE è settata sul file secrets.py allora l'argomento non è obbligatorio 
 print(p.address)
 # > "Via Nazionale, 123"
